@@ -40,7 +40,6 @@ class Tab {
     });
 
     this.view.webContents.on(DID_NAVIGATE, (_, url) => {
-      console.log("tt", url);
       // Notify the renderer process about the URL change
       this.navBarView.webContents.send(TAB_UPDATED, {
         tabId: this.id,

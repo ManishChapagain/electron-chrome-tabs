@@ -42,10 +42,8 @@ class TabbedWindow {
   }
 
   switchTab(tabId: number): void {
-    console.log(this.tabs);
     if (!tabId) return;
 
-    console.log("switching to", tabId);
     if (this.activeTab?.id == tabId) return;
 
     if (this.activeTab) {
@@ -72,7 +70,6 @@ class TabbedWindow {
   }
 
   closeTab(tabId: number): void {
-    console.log("closing tab", tabId);
     if (!tabId) return;
 
     const tab = this.tabs.find((tab) => tab.id == tabId);
@@ -231,7 +228,6 @@ class TabbedWindow {
             accelerator:
               process.platform == "darwin" ? "Cmd+Alt+I" : "Ctrl+Shift+I",
             click: () => {
-              console.log(this.activeTab);
               if (this.activeTab) {
                 this.activeTab?.view?.webContents?.toggleDevTools();
               }
