@@ -1,0 +1,28 @@
+{
+  "name": "electron-tabs-new",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "webpack"
+  },
+  "author": "Manish Chapagain",
+  "license": "MIT",
+  "devDependencies": {
+    "@electron/remote": "^2.1.2",
+    "@types/draggabilly": "^2.1.6",
+    "@types/node": "^22.13.8",
+    "electron": "^34.3.0",
+    "html-webpack-plugin": "^5.6.3",
+    "ts-loader": "^9.5.2",
+    "css-loader": "^7.1.2",
+    "style-loader": "^4.0.0",
+    "typescript": "^5.8.2",
+    "webpack": "^5.98.0",
+    "webpack-cli": "^6.0.1"
+  },
+  "dependencies": {
+    "chrome-tabs": "^5.4.0"
+  }
+}

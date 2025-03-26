@@ -1,0 +1,52 @@
+@import "~chrome-tabs/css/chrome-tabs.css";
+@import "~chrome-tabs/css/chrome-tabs-dark-theme.css";
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: system-ui, -apple-system, sans-serif;
+  overflow: hidden;
+}
+
+#address-bar {
+  position: absolute;
+  top: 46px;
+  left: 0;
+  right: 0;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  border-bottom: 1px solid #ddd;
+  z-index: 1;
+}
+
+#address-input {
+  flex: 1;
+  margin: 0 10px;
+  padding: 6px 10px;
+  border-radius: 15px;
+  border: 1px solid #ccc;
+  outline: none;
+}
+
+.nav-button {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+}
+
+.nav-button:hover {
+  background: #e0e0e0;
+}
+
+.nav-button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
