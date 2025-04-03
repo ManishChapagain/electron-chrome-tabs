@@ -15,8 +15,6 @@ class NavBar {
       },
     });
 
-    this.view.webContents.openDevTools();
-
     this.view.webContents.loadFile(
       path.join(libPath, "components", "Navbar", "ui", "navbar.html")
     );
