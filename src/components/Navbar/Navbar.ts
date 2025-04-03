@@ -5,16 +5,20 @@ class NavBar {
   public view: WebContentsView;
 
   constructor(private parentWindow: BaseWindow) {
+    const libPath = path.dirname(
+      eval("require.resolve")("electron-chrome-tabs")
+    );
+
     this.view = new WebContentsView({
       webPreferences: {
-        preload: path.join(__dirname, "components", "Navbar", "preload.js"),
+        preload: path.join(libPath, "components", "Navbar", "preload.js"),
       },
     });
 
     this.view.webContents.openDevTools();
 
     this.view.webContents.loadFile(
-      path.join(__dirname, "components", "Navbar", "ui", "navbar.html")
+      path.join(libPath, "components", "Navbar", "ui", "navbar.html")
     );
 
     this.parentWindow.contentView.addChildView(this.view);
