@@ -1,13 +1,10 @@
-import TabbedWindow from "./TabbedWindow";
+import TabbedWindow, { TabbedWindowOptions } from "./TabbedWindow";
 
 class Browser {
   private windows: Map<number, TabbedWindow> = new Map();
 
-  createWindow(
-    defaultURL?: string,
-    defaultSearchEngine?: string
-  ): TabbedWindow {
-    const newWindow = new TabbedWindow(defaultURL, defaultSearchEngine);
+  createWindow(options: TabbedWindowOptions = {}): TabbedWindow {
+    const newWindow = new TabbedWindow(options);
     this.windows.set(newWindow.id, newWindow);
     return newWindow;
   }

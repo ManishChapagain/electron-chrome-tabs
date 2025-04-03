@@ -1,4 +1,4 @@
-import { WebContentsView, BaseWindow } from "electron";
+import { WebContentsView, BaseWindow, Session, session } from "electron";
 import {
   DID_NAVIGATE,
   DID_NAVIGATE_IN_PAGE,
@@ -14,9 +14,14 @@ class Tab {
   constructor(
     private parentWindow: BaseWindow,
     private navBarView: WebContentsView,
-    url: string
+    url: string,
+    customSession: Session
   ) {
-    this.view = new WebContentsView();
+    this.view = new WebContentsView({
+      webPreferences: {
+        session: customSession,
+      },
+    });
     this.id = this.view.webContents.id;
 
     this.parentWindow.contentView.addChildView(this.view);

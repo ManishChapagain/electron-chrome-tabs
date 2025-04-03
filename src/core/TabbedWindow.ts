@@ -1,7 +1,19 @@
-import { BaseWindow, Menu, MenuItemConstructorOptions } from "electron";
+import {
+  BaseWindow,
+  Menu,
+  MenuItemConstructorOptions,
+  session,
+} from "electron";
 import Tab from "./Tab";
 import NavBar from "../components/Navbar/Navbar";
 import { TAB_ACTION, TAB_ACTION_TYPE } from "../utils/constants";
+import { Session } from "electron";
+
+export interface TabbedWindowOptions {
+  defaultURL?: string;
+  defaultSearchEngine?: string;
+  customSession?: Session;
+}
 
 class TabbedWindow {
   private window: BaseWindow;
@@ -10,10 +22,18 @@ class TabbedWindow {
   private activeTab: Tab | null = null;
   private defaultURL: string;
   private defaultSearchEngineUrl: string;
+  private customSession: Session;
 
-  constructor(defaultURL: string = "", defaultSearchEngine: string = "google") {
+  constructor(options: TabbedWindowOptions) {
+    const {
+      defaultURL = "",
+      defaultSearchEngine = "google",
+      customSession = session.defaultSession,
+    } = options;
+
     this.defaultURL = defaultURL;
     this.defaultSearchEngineUrl = `https://www.${defaultSearchEngine}.com/search?q=`;
+    this.customSession = customSession;
 
     this.window = new BaseWindow({
       width: 1024,
@@ -36,7 +56,12 @@ class TabbedWindow {
   }
 
   addTab(url?: string): number {
-    const tab = new Tab(this.window, this.navBar.view, url || this.defaultURL);
+    const tab = new Tab(
+      this.window,
+      this.navBar.view,
+      url || this.defaultURL,
+      this.customSession
+    );
     this.tabs.push(tab);
     return tab.id;
   }
