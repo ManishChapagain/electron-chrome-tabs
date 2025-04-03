@@ -1,6 +1,6 @@
 {
   "name": "electron-chrome-tabs",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A customizable browser for Electron applications.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -21,7 +21,13 @@
     "url": "https://github.com/ManishChapagain/electron-chrome-tabs/issues"
   },
   "homepage": "https://github.com/ManishChapagain/electron-chrome-tabs",
-  "keywords": ["electron", "tabs", "electron-tabs", "browser", "chrome"],
+  "keywords": [
+    "electron",
+    "tabs",
+    "electron-tabs",
+    "browser",
+    "chrome"
+  ],
   "devDependencies": {
     "@electron/remote": "^2.1.2",
     "@types/draggabilly": "^2.1.6",
