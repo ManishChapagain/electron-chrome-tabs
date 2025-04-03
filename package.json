@@ -1,14 +1,27 @@
 {
-  "name": "electron-tabs-new",
-  "version": "1.0.0",
-  "description": "",
+  "name": "electron-chrome-tabs",
+  "version": "0.1.0",
+  "description": "A customizable browser for Electron applications.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "webpack"
+    "build": "webpack",
+    "prepublishOnly": "npm run build"
   },
+  "files": [
+    "dist/**/*"
+  ],
   "author": "Manish Chapagain",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ManishChapagain/electron-chrome-tabs.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ManishChapagain/electron-chrome-tabs/issues"
+  },
+  "homepage": "https://github.com/ManishChapagain/electron-chrome-tabs",
+  "keywords": ["electron", "tabs", "electron-tabs", "browser", "chrome"],
   "devDependencies": {
     "@electron/remote": "^2.1.2",
     "@types/draggabilly": "^2.1.6",
