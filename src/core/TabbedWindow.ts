@@ -117,11 +117,7 @@ class TabbedWindow {
 
       this.tabs.splice(this.tabs.indexOf(tab), 1);
 
-      // Switch to another tab if available
-      if (this.tabs.length > 0) {
-        const nextTabId = this.tabs[0].id;
-        this.switchTab(nextTabId);
-      } else {
+      if (this.tabs.length < 1) {
         this.window.close();
       }
     }
