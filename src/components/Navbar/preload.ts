@@ -2,16 +2,18 @@ import { contextBridge, ipcRenderer, IpcRendererEvent } from "electron";
 import {
   TAB_ACTION,
   TAB_ACTION_TYPE,
+  TAB_ADDED,
   TAB_UPDATED,
 } from "../../utils/constants";
 
 const ChromeTabs = require("chrome-tabs");
 
-type TabProperties = {
-  tabId: string;
+export type TabProperties = {
+  id: number;
   url?: string;
   title?: string;
   favicon?: string;
+  _internal?: boolean;
 };
 
 type TabCallback = (data: TabProperties) => void;
@@ -34,18 +36,15 @@ contextBridge.exposeInMainWorld("tabManagerBridge", {
     });
 
     tabsContainer.addEventListener("tabAdd", async ({ detail }: any) => {
-      const addedTabEl = detail.tabEl;
-
-      if (!addedTabEl) return;
-
-      const tabId = await ipcRenderer.invoke(
-        TAB_ACTION_TYPE,
-        TAB_ACTION.ADD_TAB,
-        {}
-      );
-
-      chromeTabs.updateTab(addedTabEl, { id: tabId, title: "New Tab" });
-      ipcRenderer.send(TAB_ACTION_TYPE, TAB_ACTION.SWITCH_TAB, { tabId });
+      if (!detail.tabEl.dataset.tabId) {
+        const tabId = await ipcRenderer.invoke(
+          TAB_ACTION_TYPE,
+          TAB_ACTION.ADD_TAB,
+          { _internal: true }
+        );
+        chromeTabs.updateTab(detail.tabEl, { id: tabId, title: "New Tab" });
+        ipcRenderer.send(TAB_ACTION_TYPE, TAB_ACTION.SWITCH_TAB, { tabId });
+      }
     });
 
     tabsContainer.addEventListener("tabRemove", ({ detail }: any) => {
@@ -58,23 +57,24 @@ contextBridge.exposeInMainWorld("tabManagerBridge", {
     chromeTabs.addTab();
 
     return {
-      updateTab: (
-        tabId: string,
-        properties: { title?: string; favicon?: string[] }
-      ) => {
+      addTab: (tabProperties: TabProperties) => {
+        chromeTabs.addTab(tabProperties);
+      },
+      updateTab: (tabProperties: TabProperties) => {
         const tabEl = chromeTabs.tabEls.find(
-          (t: HTMLElement) => t.dataset.tabId === tabId
+          (t: HTMLElement) =>
+            parseInt(t?.dataset.tabId || "0") === tabProperties.id
         );
         if (tabEl) {
-          if (properties.title) {
+          if (tabProperties.title) {
             chromeTabs.updateTab(tabEl, {
-              title: properties.title,
+              title: tabProperties.title,
             });
           }
-          if (properties.favicon) {
+          if (tabProperties.favicon) {
             chromeTabs.updateTab(tabEl, {
-              title: properties.title,
-              favicon: properties.favicon[0],
+              title: tabProperties.title,
+              favicon: tabProperties.favicon[0],
             });
           }
         }
@@ -82,7 +82,6 @@ contextBridge.exposeInMainWorld("tabManagerBridge", {
       getActiveTabId: () => {
         return chromeTabs.activeTabEl?.dataset.tabId;
       },
-      addNewTab: () => chromeTabs.addTab(),
     };
   },
   addTab: async (url?: string) => {
@@ -109,6 +108,11 @@ contextBridge.exposeInMainWorld("tabManagerBridge", {
     ipcRenderer.send(TAB_ACTION_TYPE, TAB_ACTION.GO_FORWARD);
   },
 
+  onTabAdded: (callback: TabCallback) => {
+    ipcRenderer.on(TAB_ADDED, (_: IpcRendererEvent, data: TabProperties) =>
+      callback(data)
+    );
+  },
   onTabUpdated: (callback: TabCallback) => {
     ipcRenderer.on(TAB_UPDATED, (_: IpcRendererEvent, data: TabProperties) =>
       callback(data)

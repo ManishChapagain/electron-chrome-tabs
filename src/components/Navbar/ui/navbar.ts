@@ -1,3 +1,4 @@
+import { TabProperties } from "../preload";
 import "./navbar.css";
 
 // Access the tabManagerBridge from preload.js
@@ -6,11 +7,12 @@ const tabManager = (window as any).tabManagerBridge || {};
 // Initialize Chrome Tabs
 const chromeTabsApi = tabManager.initChromeTabs();
 
-tabManager.onTabUpdated((data: any) => {
-  chromeTabsApi.updateTab(data.tabId.toString(), {
-    title: data.title,
-    favicon: data.favicon,
-  });
+tabManager.onTabAdded((data: TabProperties) => {
+  chromeTabsApi.addTab(data);
+});
+
+tabManager.onTabUpdated((data: TabProperties) => {
+  chromeTabsApi.updateTab(data);
 
   if (data.url) {
     const addressInput = document.getElementById(

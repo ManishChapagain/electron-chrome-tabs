@@ -1,3 +1,4 @@
+export const TAB_ADDED = "tab-added";
 export const TAB_UPDATED = "tab-updated";
 export const TAB_ACTION_TYPE = "tab-action";
 

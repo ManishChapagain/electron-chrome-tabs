@@ -30,7 +30,7 @@ class Tab {
     this.view.webContents.on(PAGE_TITLE_UPDATED, (_, title) => {
       // Notify the renderer process about the title change
       this.navBarView.webContents.send(TAB_UPDATED, {
-        tabId: this.id,
+        id: this.id,
         title: title,
       });
     });
@@ -38,7 +38,7 @@ class Tab {
     this.view.webContents.on(PAGE_FAVICON_UPDATED, (_, favicon) => {
       // Notify the renderer process about the title change
       this.navBarView.webContents.send(TAB_UPDATED, {
-        tabId: this.id,
+        id: this.id,
         title: this.view.webContents.getTitle(),
         favicon: favicon,
       });
@@ -47,7 +47,7 @@ class Tab {
     this.view.webContents.on(DID_NAVIGATE, (_, url) => {
       // Notify the renderer process about the URL change
       this.navBarView.webContents.send(TAB_UPDATED, {
-        tabId: this.id,
+        id: this.id,
         url: url,
       });
     });
@@ -56,7 +56,7 @@ class Tab {
       // Notify the renderer process about the URL change
       if (isMainFrame) {
         this.navBarView.webContents.send(TAB_UPDATED, {
-          tabId: this.id,
+          id: this.id,
           url: url,
         });
       }

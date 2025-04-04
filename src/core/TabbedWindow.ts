@@ -55,7 +55,10 @@ class TabbedWindow {
     return this.window.id;
   }
 
-  addTab(url?: string): number {
+  // internal parameter needed since we don't want to send the tab-added
+  // event to the navbar when we add a new tab from the navbar itself
+  // todo: find a better way to handle this
+  addTab(url?: string, _internal = false): number {
     const tab = new Tab(
       this.window,
       this.navBar.view,
@@ -63,6 +66,14 @@ class TabbedWindow {
       this.customSession
     );
     this.tabs.push(tab);
+
+    if (!_internal) {
+      this.navBar.view.webContents.send("tab-added", {
+        id: tab.id,
+        url: url || this.defaultURL,
+      });
+    }
+
     return tab.id;
   }
 
@@ -198,7 +209,7 @@ class TabbedWindow {
   private async handleAsyncTabAction(action: string, data: any): Promise<any> {
     switch (action) {
       case TAB_ACTION.ADD_TAB:
-        return this.addTab(data?.url);
+        return this.addTab(data?.url, data?._internal);
       default:
         return null;
     }
