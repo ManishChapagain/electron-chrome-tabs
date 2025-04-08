@@ -28,6 +28,7 @@ class TabbedWindow {
   readonly browser: Browser;
   readonly window: BaseWindow;
   readonly navBar: NavBar;
+  readonly defaultSearchEngine: string;
   readonly defaultSearchEngineUrl: string;
   readonly tabs: Tab[] = [];
   activeTab: Tab | null = null;
@@ -35,7 +36,9 @@ class TabbedWindow {
   constructor(browser: Browser, options: TabbedWindowOptions) {
     this.options = options;
     this.browser = browser;
-    this.defaultSearchEngineUrl = `https://www.${this.options.defaultSearchEngine}.com/search?q=`;
+
+    this.defaultSearchEngine = this.options.defaultSearchEngine || "google";
+    this.defaultSearchEngineUrl = `https://www.${this.defaultSearchEngine}.com/search?q=`;
 
     this.window = new BaseWindow({
       width: 1024,

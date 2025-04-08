@@ -76,7 +76,7 @@ export function createContextMenu(
       const showEllipsis = trimmedText.length > 20 ? "..." : "";
 
       addItem(
-        `Search ${parentWindow.options.defaultSearchEngine} for "${shortText}${showEllipsis}"`,
+        `Search ${parentWindow.defaultSearchEngine} for "${shortText}${showEllipsis}"`,
         () => {
           const searchURL = `${
             parentWindow.defaultSearchEngineUrl
