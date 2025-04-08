@@ -3,37 +3,39 @@ import {
   Menu,
   MenuItemConstructorOptions,
   session,
+  WebContentsViewConstructorOptions,
 } from "electron";
 import Tab from "./Tab";
 import NavBar from "../components/Navbar/Navbar";
-import { TAB_ACTION, TAB_ACTION_TYPE } from "../utils/constants";
+import {
+  TAB_ACTION,
+  TAB_ACTION_TYPE,
+  TAB_ADDED,
+  TAB_UPDATED,
+} from "../utils/constants";
 import { Session } from "electron";
+import Browser from "./Browser";
 
 export interface TabbedWindowOptions {
   defaultURL?: string;
   defaultSearchEngine?: string;
   customSession?: Session;
+  initialTabURL?: string;
 }
 
 class TabbedWindow {
-  private window: BaseWindow;
-  private navBar: NavBar;
-  private tabs: Tab[] = [];
-  private activeTab: Tab | null = null;
-  private defaultURL: string;
-  private defaultSearchEngineUrl: string;
-  private customSession: Session;
+  readonly options: TabbedWindowOptions;
+  readonly browser: Browser;
+  readonly window: BaseWindow;
+  readonly navBar: NavBar;
+  readonly defaultSearchEngineUrl: string;
+  readonly tabs: Tab[] = [];
+  activeTab: Tab | null = null;
 
-  constructor(options: TabbedWindowOptions) {
-    const {
-      defaultURL = "",
-      defaultSearchEngine = "google",
-      customSession = session.defaultSession,
-    } = options;
-
-    this.defaultURL = defaultURL;
-    this.defaultSearchEngineUrl = `https://www.${defaultSearchEngine}.com/search?q=`;
-    this.customSession = customSession;
+  constructor(browser: Browser, options: TabbedWindowOptions) {
+    this.options = options;
+    this.browser = browser;
+    this.defaultSearchEngineUrl = `https://www.${this.options.defaultSearchEngine}.com/search?q=`;
 
     this.window = new BaseWindow({
       width: 1024,
@@ -49,6 +51,9 @@ class TabbedWindow {
 
     this.setupIPC();
     this.createMenu();
+
+    // add the initial tab
+    this.addTab({ url: this.options.initialTabURL });
   }
 
   get id(): number {
@@ -58,19 +63,30 @@ class TabbedWindow {
   // internal parameter needed since we don't want to send the tab-added
   // event to the navbar when we add a new tab from the navbar itself
   // todo: find a better way to handle this
-  addTab(url?: string, _internal = false): number {
+  addTab({
+    url,
+    background = false,
+    _internal = false,
+    webContentsViewConstructorOptions,
+  }: {
+    url?: string;
+    background?: boolean;
+    _internal?: boolean;
+    webContentsViewConstructorOptions?: WebContentsViewConstructorOptions;
+  } = {}): number {
     const tab = new Tab(
-      this.window,
-      this.navBar.view,
-      url || this.defaultURL,
-      this.customSession
+      this,
+      url || this.options.defaultURL || "",
+      webContentsViewConstructorOptions,
+      this.options.customSession || session.defaultSession
     );
     this.tabs.push(tab);
 
     if (!_internal) {
-      this.navBar.view.webContents.send("tab-added", {
+      this.navBar.view.webContents.send(TAB_ADDED, {
         id: tab.id,
-        url: url || this.defaultURL,
+        url: url || this.options.defaultURL,
+        background,
       });
     }
 
@@ -99,7 +115,7 @@ class TabbedWindow {
       this.activeTab?.view?.webContents?.focus();
     }
 
-    this.navBar.view.webContents.send("tab-updated", {
+    this.navBar.view.webContents.send(TAB_UPDATED, {
       tabId: tabId,
       url: newTab?.view.webContents.getURL(),
     });
@@ -205,7 +221,11 @@ class TabbedWindow {
   private async handleAsyncTabAction(action: string, data: any): Promise<any> {
     switch (action) {
       case TAB_ACTION.ADD_TAB:
-        return this.addTab(data?.url, data?._internal);
+        return this.addTab({
+          url: data?.url,
+          background: data?.background,
+          _internal: data?._internal,
+        });
       default:
         return null;
     }

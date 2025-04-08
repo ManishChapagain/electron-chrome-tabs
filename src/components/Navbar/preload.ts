@@ -13,6 +13,7 @@ export type TabProperties = {
   url?: string;
   title?: string;
   favicon?: string;
+  background?: boolean;
   _internal?: boolean;
 };
 
@@ -54,11 +55,11 @@ contextBridge.exposeInMainWorld("tabManagerBridge", {
       }
     });
 
-    chromeTabs.addTab();
-
     return {
       addTab: (tabProperties: TabProperties) => {
-        chromeTabs.addTab(tabProperties);
+        chromeTabs.addTab(tabProperties, {
+          background: tabProperties.background,
+        });
       },
       updateTab: (tabProperties: TabProperties) => {
         const tabEl = chromeTabs.tabEls.find(
