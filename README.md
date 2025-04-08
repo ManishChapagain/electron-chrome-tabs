@@ -18,7 +18,6 @@ A lightweight, minimal library that adds tabbed browsing to your Electron applic
 This is a minimal implementation focused on core functionality. Unlike Chrome, it currently does not include:
 - Bookmarks 
 - Find-in-page
-- Context-menu 
 - Downloads manager
 - Extensions
 - Tab groups or tab pinning
