@@ -17,6 +17,7 @@ import {
   TAB_UPDATED,
 } from "../utils/constants";
 import TabbedWindow from "./TabbedWindow";
+import { createContextMenu } from "../utils/context-menu";
 
 class Tab {
   public readonly id: number;
@@ -91,6 +92,15 @@ class Tab {
     this.view.webContents.setWindowOpenHandler((details: HandlerDetails) =>
       this.handleWindowOpen(details)
     );
+
+    this.view.webContents.on("context-menu", (_, params) => {
+      const menu = createContextMenu(
+        this.parentWindow,
+        this.view.webContents,
+        params
+      );
+      menu.popup();
+    });
   }
 
   get navBar() {
