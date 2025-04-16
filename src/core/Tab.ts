@@ -18,6 +18,7 @@ import {
 } from "../utils/constants";
 import TabbedWindow from "./TabbedWindow";
 import { createContextMenu } from "../utils/context-menu";
+import { TabProperties } from "../components/Navbar/preload";
 
 class Tab {
   public readonly id: number;
@@ -54,38 +55,26 @@ class Tab {
     this.parentWindow.window.contentView.addChildView(this.view);
     this.view.webContents.loadURL(this.url);
 
-    this.view.webContents.on(PAGE_TITLE_UPDATED, (_, title) => {
-      // Notify the renderer process about the title change
-      this.navBar.webContents.send(TAB_UPDATED, {
+    const sendTabUpdate = (update: Partial<TabProperties>) => {
+      this.parentWindow.navBar.webContents.send(TAB_UPDATED, {
         id: this.id,
-        title: title,
+        ...update,
       });
-    });
+    };
 
-    this.view.webContents.on(PAGE_FAVICON_UPDATED, (_, favicon) => {
-      // Notify the renderer process about the title change
-      this.navBar.webContents.send(TAB_UPDATED, {
-        id: this.id,
-        title: this.view.webContents.getTitle(),
-        favicon: favicon,
-      });
-    });
+    this.view.webContents.on(PAGE_TITLE_UPDATED, (_, title) =>
+      sendTabUpdate({ title })
+    );
 
-    this.view.webContents.on(DID_NAVIGATE, (_, url) => {
-      // Notify the renderer process about the URL change
-      this.navBar.webContents.send(TAB_UPDATED, {
-        id: this.id,
-        url: url,
-      });
-    });
+    this.view.webContents.on(PAGE_FAVICON_UPDATED, (_, favicon) =>
+      sendTabUpdate({ title: this.view.webContents.getTitle(), favicon })
+    );
+
+    this.view.webContents.on(DID_NAVIGATE, (_, url) => sendTabUpdate({ url }));
 
     this.view.webContents.on(DID_NAVIGATE_IN_PAGE, (_, url, isMainFrame) => {
-      // Notify the renderer process about the URL change
       if (isMainFrame) {
-        this.navBar.webContents.send(TAB_UPDATED, {
-          id: this.id,
-          url: url,
-        });
+        sendTabUpdate({ url });
       }
     });
 

@@ -12,7 +12,7 @@ export type TabProperties = {
   id: number;
   url?: string;
   title?: string;
-  favicon?: string;
+  favicon?: string[];
   background?: boolean;
   _internal?: boolean;
 };
