@@ -1,13 +1,5 @@
-import {
-  clipboard,
-  Menu,
-  MenuItem,
-  WebContents,
-  dialog,
-  BrowserWindow,
-} from "electron";
+import { clipboard, Menu, MenuItem, WebContents } from "electron";
 import TabbedWindow from "../core/TabbedWindow";
-import * as fs from "fs";
 
 export function createContextMenu(
   parentWindow: TabbedWindow,
@@ -93,58 +85,7 @@ export function createContextMenu(
         }
       );
     }
-    addItem("Print...", async () => {
-      try {
-        const selectedHTML = await webContents.executeJavaScript(`
-          (function () {
-            const selection = window.getSelection();
-            const container = document.createElement('div');
-            if (selection.rangeCount) {
-              container.appendChild(selection.getRangeAt(0).cloneContents());
-            }
-            const styles = Array.from(document.querySelectorAll('style')).map(style => style.outerHTML).join("\\n");
-            return {
-              html: container.innerHTML,
-              styles,
-            };
-          })();
-        `);
-        console.log(selectedHTML);
-
-        const fullHtml = `<html><head>${selectedHTML.styles}</head><body>${selectedHTML.html}</body></html>`;
-        // const inlined = juice(fullHtml);
-
-        // const tempHtml = `
-        //   <html>
-        //     <head><title>Print Selection</title></head>
-        //     <body>${selectedHTML}</body>
-        //   </html>
-        // `;
-
-        const tempWindow = new BrowserWindow({});
-        await tempWindow.loadURL(
-          "data:text/html;charset=utf-8," + encodeURIComponent(fullHtml)
-        );
-        const pdfData = await tempWindow.webContents.printToPDF({});
-        // tempWindow.close();
-
-        const { filePath, canceled } = await dialog.showSaveDialog({
-          title: params.titleText,
-          defaultPath: params.suggestedFilename,
-          filters: [{ name: "PDF Files", extensions: ["pdf"] }],
-        });
-
-        if (!canceled && filePath) {
-          fs.writeFile(filePath, pdfData, (err) => {
-            if (err) throw err;
-            console.log(`Wrote PDF successfully to ${filePath}`);
-            parentWindow.addTab({ url: `file://${filePath}` });
-          });
-        }
-      } catch (err) {
-        console.error("Failed to generate PDF:", err);
-      }
-    });
+    addItem("Print...", () => webContents.print());
     addSeparator();
   }
 
@@ -162,27 +103,7 @@ export function createContextMenu(
     addItem("Reload", () => webContents.reload());
     addSeparator();
     addItem("Save as...", () => webContents.downloadURL(webContents.getURL()));
-    addItem("Print...", async () => {
-      try {
-        const pdfData = await webContents.printToPDF({});
-
-        const { filePath, canceled } = await dialog.showSaveDialog({
-          title: params.titleText,
-          defaultPath: params.suggestedFilename,
-          filters: [{ name: "PDF Files", extensions: ["pdf"] }],
-        });
-
-        if (!canceled && filePath) {
-          fs.writeFile(filePath, pdfData, (err) => {
-            if (err) throw err;
-            console.log(`Wrote PDF successfully to ${filePath}`);
-            parentWindow.addTab({ url: `file://${filePath}` });
-          });
-        }
-      } catch (err) {
-        console.error("Failed to generate PDF:", err);
-      }
-    });
+    addItem("Print...", () => webContents.print());
     addSeparator();
   }
 
@@ -190,7 +111,3 @@ export function createContextMenu(
 
   return menu;
 }
-
-// function downloadPdf(selection: string): string {
-//   const fileName = `${selection.replace(/\s/g, "-")}.pdf`;
-// }

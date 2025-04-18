@@ -16,7 +16,6 @@ import {
 import { Session } from "electron";
 import Browser from "./Browser";
 import { TabProperties } from "../components/Navbar/preload";
-import EventEmitter from "events";
 
 export interface TabbedWindowOptions {
   defaultURL?: string;
@@ -25,7 +24,7 @@ export interface TabbedWindowOptions {
   initialTabURL?: string;
 }
 
-class TabbedWindow extends EventEmitter {
+class TabbedWindow {
   readonly options: TabbedWindowOptions;
   readonly browser: Browser;
   readonly window: BaseWindow;
@@ -36,7 +35,6 @@ class TabbedWindow extends EventEmitter {
   activeTab: Tab | null = null;
 
   constructor(browser: Browser, options: TabbedWindowOptions) {
-    super();
     this.options = options;
     this.browser = browser;
 
@@ -51,17 +49,15 @@ class TabbedWindow extends EventEmitter {
     this.window.setMinimumSize(300, 87);
 
     this.navBar = new NavBar(this.window);
+
+    this.resizeViews();
+    this.window.on("resize", () => this.resizeViews());
+
+    this.setupIPC();
     this.createMenu();
 
-    // emit ready when the navbar is ready
-    this.navBar.webContents.once("did-finish-load", () => {
-      this.resizeViews();
-      this.window.on("resize", () => this.resizeViews());
-      this.setupIPC();
-      this.addTab({ url: this.options.initialTabURL });
-
-      this.emit("ready");
-    });
+    // add the initial tab
+    this.addTab({ url: this.options.initialTabURL });
   }
 
   get id(): number {
