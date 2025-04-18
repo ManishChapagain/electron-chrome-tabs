@@ -30,9 +30,9 @@ contextBridge.exposeInMainWorld("tabManagerBridge", {
     chromeTabs.init(tabsContainer);
 
     tabsContainer.addEventListener("activeTabChange", ({ detail }: any) => {
-      const tabId = detail.tabEl.dataset.tabId;
+      const tabId = parseInt(detail.tabEl.dataset.tabId);
       if (tabId) {
-        ipcRenderer.send(TAB_ACTION_TYPE, TAB_ACTION.SWITCH_TAB, { tabId });
+        ipcRenderer.send(TAB_ACTION_TYPE, TAB_ACTION.SWITCH_TAB, { id: tabId });
       }
     });
 
@@ -44,14 +44,14 @@ contextBridge.exposeInMainWorld("tabManagerBridge", {
           { _internal: true }
         );
         chromeTabs.updateTab(detail.tabEl, { id: tabId, title: "New Tab" });
-        ipcRenderer.send(TAB_ACTION_TYPE, TAB_ACTION.SWITCH_TAB, { tabId });
+        ipcRenderer.send(TAB_ACTION_TYPE, TAB_ACTION.SWITCH_TAB, { id: tabId });
       }
     });
 
     tabsContainer.addEventListener("tabRemove", ({ detail }: any) => {
-      const tabId = detail.tabEl.dataset.tabId;
+      const tabId = parseInt(detail.tabEl.dataset.tabId);
       if (tabId) {
-        ipcRenderer.send(TAB_ACTION_TYPE, TAB_ACTION.CLOSE_TAB, { tabId });
+        ipcRenderer.send(TAB_ACTION_TYPE, TAB_ACTION.CLOSE_TAB, { id: tabId });
       }
     });
 
@@ -81,7 +81,7 @@ contextBridge.exposeInMainWorld("tabManagerBridge", {
         }
       },
       getActiveTabId: () => {
-        return chromeTabs.activeTabEl?.dataset.tabId;
+        return parseInt(chromeTabs.activeTabEl?.dataset.tabId);
       },
     };
   },
@@ -90,10 +90,10 @@ contextBridge.exposeInMainWorld("tabManagerBridge", {
       url,
     });
   },
-  closeTab: (tabId: string) =>
-    ipcRenderer.send(TAB_ACTION_TYPE, TAB_ACTION.CLOSE_TAB, { tabId }),
-  switchTab: (tabId: string) =>
-    ipcRenderer.send(TAB_ACTION_TYPE, TAB_ACTION.SWITCH_TAB, { tabId }),
+  closeTab: (id: number) =>
+    ipcRenderer.send(TAB_ACTION_TYPE, TAB_ACTION.CLOSE_TAB, { id }),
+  switchTab: (id: number) =>
+    ipcRenderer.send(TAB_ACTION_TYPE, TAB_ACTION.SWITCH_TAB, { id }),
 
   // Navigation functions
   navigate: (url: string) => {

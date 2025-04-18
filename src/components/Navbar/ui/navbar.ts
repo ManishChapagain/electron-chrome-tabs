@@ -13,8 +13,11 @@ tabManager.onTabAdded((data: TabProperties) => {
 
 tabManager.onTabUpdated((data: TabProperties) => {
   chromeTabsApi.updateTab(data);
-
-  if (data.url !== null && data.url !== undefined) {
+  if (
+    data.url !== null &&
+    data.url !== undefined &&
+    data.id === chromeTabsApi.getActiveTabId()
+  ) {
     const addressInput = document.getElementById(
       "address-input"
     ) as HTMLInputElement;

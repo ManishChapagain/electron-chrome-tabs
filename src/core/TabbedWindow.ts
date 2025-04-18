@@ -15,6 +15,7 @@ import {
 } from "../utils/constants";
 import { Session } from "electron";
 import Browser from "./Browser";
+import { TabProperties } from "../components/Navbar/preload";
 
 export interface TabbedWindowOptions {
   defaultURL?: string;
@@ -86,20 +87,21 @@ class TabbedWindow {
     this.tabs.push(tab);
 
     if (!_internal) {
-      this.navBar.view.webContents.send(TAB_ADDED, {
+      const tabProperties: TabProperties = {
         id: tab.id,
         url: url || this.options.defaultURL,
         background,
-      });
+      };
+      this.navBar.webContents.send(TAB_ADDED, tabProperties);
     }
 
     return tab.id;
   }
 
-  switchTab(tabId: number): void {
-    if (!tabId) return;
+  switchTab(id: number): void {
+    if (!id) return;
 
-    if (this.activeTab?.id == tabId) return;
+    if (this.activeTab?.id == id) return;
 
     if (this.activeTab) {
       this.activeTab?.view.setBounds({
@@ -111,23 +113,23 @@ class TabbedWindow {
     }
 
     // Show the new active tab
-    const newTab = this.tabs.find((tab: Tab) => tab.id == tabId);
+    const newTab = this.tabs.find((tab: Tab) => tab.id == id);
     if (newTab) {
       this.activeTab = newTab;
       this.resizeViews(); // Resize to fit the content area
       this.activeTab?.view?.webContents?.focus();
     }
-
-    this.navBar.view.webContents.send(TAB_UPDATED, {
-      tabId: tabId,
+    const tabProperties: TabProperties = {
+      id,
       url: newTab?.view.webContents.getURL(),
-    });
+    };
+    this.navBar.webContents.send(TAB_UPDATED, tabProperties);
   }
 
-  closeTab(tabId: number): void {
-    if (!tabId) return;
+  closeTab(id: number): void {
+    if (!id) return;
 
-    const tab = this.tabs.find((tab) => tab.id == tabId);
+    const tab = this.tabs.find((tab) => tab.id == id);
     if (tab) {
       this.window.contentView.removeChildView(tab.view);
 
@@ -199,10 +201,10 @@ class TabbedWindow {
   private handleSyncTabAction(action: string, data: any): void {
     switch (action) {
       case TAB_ACTION.CLOSE_TAB:
-        this.closeTab(data?.tabId);
+        this.closeTab(data?.id);
         break;
       case TAB_ACTION.SWITCH_TAB:
-        this.switchTab(data?.tabId);
+        this.switchTab(data?.id);
         break;
       case TAB_ACTION.NAVIGATE:
         this.navigateActiveTab(data?.url);
