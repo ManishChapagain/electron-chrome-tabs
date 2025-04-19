@@ -127,8 +127,8 @@ class Tab {
 
     const createTabbedWindow = () => {
       const tabbedWindow = this.parentWindow.browser.createWindow({
-        initialTabURL: details.url,
         ...this.parentWindow.options,
+        initialTabURL: details.url,
       });
       return tabbedWindow.tabs[0].view.webContents;
     };
