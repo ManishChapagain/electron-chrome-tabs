@@ -126,11 +126,10 @@ class Tab {
     };
 
     const createTabbedWindow = () => {
-      const tabbedWindow = this.parentWindow.browser.createWindow({
+      this.parentWindow.browser.createWindow({
         ...this.parentWindow.options,
         initialTabURL: details.url,
       });
-      return tabbedWindow.tabs[0].view.webContents;
     };
 
     switch (details.disposition) {
@@ -142,7 +141,8 @@ class Tab {
         if (details.features) {
           return allowWith((options) => createBrowserWindow(options));
         } else {
-          return allowWith(() => createTabbedWindow());
+          createTabbedWindow();
+          return { action: "deny" };
         }
       default:
         return { action: "allow" };
