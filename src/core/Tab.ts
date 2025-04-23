@@ -122,6 +122,15 @@ class Tab {
       win.webContents.setWindowOpenHandler((details: HandlerDetails) =>
         this.handleWindowOpen(details)
       );
+
+      win.webContents.on("context-menu", (_, params) => {
+        const menu = createContextMenu(
+          this.parentWindow,
+          win.webContents,
+          params
+        );
+        menu.popup();
+      });
       return win.webContents;
     };
 
