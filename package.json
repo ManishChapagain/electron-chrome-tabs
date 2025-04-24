@@ -1,6 +1,6 @@
 {
   "name": "electron-chrome-tabs",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "A customizable browser for Electron applications.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
